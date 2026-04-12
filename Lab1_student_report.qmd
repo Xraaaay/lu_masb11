@@ -8,7 +8,7 @@ abstract: |
   - practice to use different graphical methods to evaluate possible distributions that your observations can come from
 author: 
   - name: "Ruowen Xiao"
-date: 2026.04.20
+date: 2026-04-20
 toc: true
 number-sections: true
 highlight-style: pygments
@@ -42,8 +42,8 @@ editor:
 
 ```{r}
 load("data/lab1_filer/jordprov.Rdata")
-# write your R-code here
 
+# write your R-code here
 View(jordprov)
 View(jordprov$al)
 ```
@@ -72,24 +72,29 @@ step function that takes a step of height $1/n$ for each data point. In
 R, you can plot this function using the command `plot.ecdf()`.
 :::
 
+Overview analysis of aluminum level:
+
 ```{r}
-sd(jordprov$al)
+sd_al = sd(jordprov$al)
+mean_al = mean(jordprov$al)
 summary(jordprov$al)
 hist(jordprov$al)
 boxplot(jordprov$al)
 plot(jordprov$al)
 ```
 
+Overview analysis of calcium level:
 
 ```{r}
-sd(jordprov$ca)
+sd_ca = sd(jordprov$ca)
+mean_ca = mean(jordprov$ca)
 summary(jordprov$ca)
 hist(jordprov$ca)
 boxplot(jordprov$ca)
 plot(jordprov$ca)
 ```
 
-If al is x and ca is y:
+If aluminum is x and calcium is y:
 
 ```{r}
 plot(jordprov$al, jordprov$ca)
@@ -102,7 +107,12 @@ plot.ecdf(jordprov$al)
 plot.ecdf(jordprov$ca)
 ```
 
-<!-- remove this and write your conclusions in simple text -->
+From the overview analyses, we found out the mean and standard deviation of 
+aluminum in this studying area are `r round(mean_al, 2)` and 
+`r round(sd_al, 2)`, while the results of calcium are `r round(mean_ca, 2)` 
+and `r round(sd_ca, 2)`, respectively. By plotting the calcium level changes 
+with aluminum, we can not determine any explicit relationships between these 
+two chemicals.
 
 ::: {.callout-note icon="false"}
 ### Task 1.2
@@ -115,12 +125,14 @@ the proportion of measurements that are below 80 mg/g.
 
 ```{r}
 plot.ecdf(jordprov$al, panel.first=grid())
+prob_al_lt80 = mean(jordprov$al <= 80)
 ```
 
 
 **Answer**:
-<!-- remove this and write your conclusions in simple text -->
-The proportion of measurements that are below 80 mg/g is near 0.78.
+
+From the ECDF figure above, the proportion of measurements that are below 
+80 mg/g is `r round(prob_al_lt80 * 100, 2)`%.
 
 ::: {.callout-note icon="false"}
 ### Task 1.3
@@ -129,12 +141,12 @@ What aluminium is exceeded in 70% of measurements?
 :::
 
 **Answer**:
-<!-- remove this and write your conclusions in simple text -->
 
 ```{r}
-quantile(jordprov$al, prob=0.3)
+quant_al_gt70p = quantile(jordprov$al, prob=0.3)
 ```
 
+When $P(X > x) = 0.7$, the aluminum level is at `r round(quant_al_gt70p, 2)` mg/g.
 
 ## Does a standard distribution fit to my data? {.unnumbered}
 
@@ -176,10 +188,8 @@ If you, for example, want to simulate 100 random numbers from a normal distribut
 Plot the 100 normal distributed random numbers in `norm1` as a histogram. Does the histogram resemble the theoretical normal distribution in the figure above? What happens if you instead create a histogram of 1000 simulated normal distributed random numbers?
 :::
 
-**Answer**:
-<!-- remove this and write your conclusions in simple text -->
-
 ```{r}
+# Normal distribution
 norm1 <- rnorm(100, 20, 3)
 hist(norm1)
 
@@ -187,6 +197,12 @@ norm2 <- rnorm(1000, 20, 3)
 hist(norm2)
 ```
 
+**Answer**:
+
+For the results of 100 simulations, the overall distribution follows a roughly 
+normal distribution pattern. However, due to the small sample size, there might 
+be some extreme values. In contrast, the results of 1000 simulations more 
+closely matches a standard normal distribution.
 
 ::: {.callout-note icon="false"}
 ### Task 2.2
@@ -195,10 +211,12 @@ Generate 1000 random numbers from an exponential distribution with a mean of 2 a
 :::
 
 ```{r}
+# Exponential distribution
 exp1 <- rexp(1000, 0.5)
 hist(exp1)
 ```
 
+The histogram of the sampled data matches an exponential distribution.
 
 ::: {.callout-note icon="false"}
 ### Task 2.3
@@ -207,12 +225,12 @@ Do the same for a uniform distribution $R(3,5)$, i.e., draw 1000 random numbers 
 :::
 
 ```{r}
-# write your R-code here
+# Uniform distribution
 unif1 <- runif(1000, 3, 5)
 hist(unif1)
 ```
 
-<!-- remove this and write your conclusions in simple text -->
+The histogram of the sampled data matches a uniform distribution.
 
 ## QQ-plot {.unnumbered}
 
@@ -225,14 +243,16 @@ Try how the QQ-plot looks like when you fit the sample with 100
 normal distributed random numbers (`norm1`) to a normal distribution using the command  `qqnorm(norm1)`. What happens when you also write `qqline(norm1)`?
 :::
 
-**Answer**:
-<!-- remove this and write your conclusions in simple text -->
-
 ```{r}
 qqnorm(norm1)
 qqline(norm1)
 ```
 
+**Answer**:
+
+The Q-Q plot is approximately linear in the central region of (-1, 1), while some 
+slight deviations occurred in the tails. Overall, the samples fit a normal 
+distribution.
 
 Since we know that `norm1` contains normal distributed random numbers, the fit should naturally be good. However, it should be noted that one cannot expect a perfect straight line in the plot, as we are dealing with random numbers. A slight deviation at both ends of the line is not uncommon.
 
@@ -242,9 +262,6 @@ Since we know that `norm1` contains normal distributed random numbers, the fit s
 What does it look like if we fit exponentially distributed random numbers `exp1` or  uniformly distributed random numbers  `unif1` to a normal distribution using the commands `qqnorm(exp1)` and `qqnorm(unif1)`, respectively?
 :::
 
-**Answer**:
-<!-- remove this and write your conclusions in simple text -->
-
 ```{r}
 qqnorm(exp1)
 qqline(exp1)
@@ -253,6 +270,12 @@ qqnorm(unif1)
 qqline(unif1)
 ```
 
+**Answer**:
+
+In the central region of (-1, 1), the observed data fit these two distributions 
+well. However, obvious deviations can be found at both ends of the lines. 
+Therefore, the samples do not fit an exponential distribution or a uniform 
+distribution.
 
 # Model for aluminum levels
 
@@ -264,13 +287,15 @@ We study the aluminum levels in the 94 samples again.
 Decide if the levels can be modelled by a normal distribution. Use the method QQ-plot with the command `qqnorm(jordprov$al)`. Does it seem to be a good fit?
 :::
 
-*Answer*: <!-- remove this and write your conclusions in simple text -->
-
 ```{r}
 qqnorm(jordprov$al)
 qqline(jordprov$al)
 ```
 
+**Answer**:
+
+The points on the Q-Q plot align with a straight line well. Therefore, it seems 
+to be a good fit to a normal distribution.
 
 Previously, you used R to calculate the mean (m) and standard deviation (s) for the aluminum levels. You can use these values as estimates of the expected value $\mu$ and the standard deviation $\sigma$ in the fitted distribution. Given that you believe a normal distribution fits the data well, *we can now set up a model for our observations.*
 
@@ -297,19 +322,17 @@ With this model, you can calculate probabilities and make predictions about futu
 What are the values on the estimated parameters?
 :::
 
-*Answer*: <!-- remove this and write your conclusions in simple text -->
-
 ```{r}
-m = mean(jordprov$al)
-s = sd(jordprov$al)
-hist(jordprov$al,probability=TRUE)
-xx <- seq(40,120,by=0.2)
-lines(xx,dnorm(xx,m,s))
-
-m
-s
+hist(jordprov$al, probability=TRUE)
+xx <- seq(40, 120, by=0.2)
+lines(xx, dnorm(xx, mean_al, sd_al))
 ```
 
+**Answer**:
+
+Mean: $\hat \mu = `r round(mean_al, 2)`$
+
+Standard deviation: $\hat \sigma = `r round(sd_al, 2)`$
 
 ::: {.callout-note icon="false"}
 ### Task 3.3
@@ -317,14 +340,13 @@ s
 Suppose you want to calculate the probability that the aluminum level in a sample exceeds 80 mg/g, in other words, you want to calculate $P(X > 80)$. In exercises, you have done this using calculators and/or tables. In R, the command for calculating the cumulative distribution function of the normal distribution $P(X \leq x)$ is `pnorm()`. Explain why the desired probability is calculated using the command `1 - pnorm(80, m, s)`.
 :::
 
-*Answer*: <!-- remove this and write your conclusions in simple text -->
-
-P(X > 80):
-
 ```{r}
-1 - pnorm(80, m, s)
+prob_al_gt80 = 1 - pnorm(80, mean_al, sd_al)
 ```
 
+**Answer**: 
+
+$P(X > 80) = `r round(prob_al_gt80, 2)`$
 
 ::: {.callout-note icon="false"}
 ### Task 3.4
@@ -332,12 +354,13 @@ P(X > 80):
 The aluminum level that will exceed 10% of future measurements is a quantile in the normal distribution. Use R to calculate the quantile with the command `qnorm(0.1,m,s)`.
 :::
 
-*Answer*: <!-- remove this and write your conclusions in simple text -->
-
 ```{r}
-qnorm(0.1, m, s)
+quant_al_gt10p = qnorm(0.1, mean_al, sd_al)
 ```
 
+**Answer**: 
+
+$Q(0.1) = `r round(quant_al_gt10p, 2)`$
 
 # Model for calcium levels
 
@@ -348,13 +371,15 @@ Try using a QQ-plot to see if the calcium levels can also be modeled with a norm
 
 :::
 
-*Answer*: <!-- remove this and write your conclusions in simple text -->
-
 ```{r}
 qqnorm(jordprov$ca)
 qqline(jordprov$ca)
 ```
 
+**Answer**:
+
+The points on the Q-Q plot above do not lie with a straight line. It does not 
+fit a normal distribution well.
 
 Another standard distribution commonly used for bio data is the lognormal distribution. Measurements can be modeled with a lognormal distribution if the **logarithms** of the measurements fit well with a normal distribution. This means that no special QQ-plot is needed for this distribution, one can use 
 `qqnorm(log(stickprovsnamn))`.
@@ -367,12 +392,14 @@ Investigate if the calcium levels can be modeled with a lognormal distribution. 
 
 :::
 
-*Answer*: <!-- remove this and write your conclusions in simple text -->
-
 ```{r}
 qqnorm(log(jordprov$ca))
 qqline(log(jordprov$ca))
 ```
+
+**Answer**: 
+
+The log values fit a normal distribution better than the initial values.
 
 Now you need to estimate the probability that a calcium measurement exceeds 30 mg/g. First, you need to set up a model for calcium measurements. Assume that calcium values follow a lognormal distribution. Then, use the model to make calculations.
 
@@ -383,19 +410,19 @@ If $Y=$ calcium level, we are looking for $P(Y>30)$, which is equivalent to $P(\
 
 :::
 
-*Answer*: <!-- remove this and write your conclusions in simple text -->
-
 ```{r}
-m = mean(log(jordprov$ca))
-s = sd(log(jordprov$ca))
+mean_log_ca = mean(log(jordprov$ca))
+sd_log_ca = sd(log(jordprov$ca))
 hist(log(jordprov$ca), probability=TRUE)
 xx <- seq(min(log(jordprov$ca)), max(log(jordprov$ca)), length.out = 200)
-lines(xx, dnorm(xx, m, s))
-
-m
-s
+lines(xx, dnorm(xx, mean_log_ca, sd_log_ca))
 ```
 
+**Answer**:
+
+Mean: $\hat \mu = `r round(mean_log_ca, 2)`$
+
+Standard deviation: $\hat \sigma = `r round(sd_log_ca, 2)`$
 
 ::: {.callout-note icon="false"}
 ### Task 4.4
@@ -403,12 +430,13 @@ s
 Calculate the probability that log(calcium levels) exceeds $\log(30)$. Provide the command you use to perform this calculation.
 :::
 
-
-*Answer*: <!-- remove this and write your conclusions in simple text -->
-
 ```{r}
-1 - pnorm(log(30), m, s)
+prob_log_ca_gt30 = 1 - pnorm(log(30), mean_log_ca, sd_log_ca)
 ```
+
+**Answer**:
+
+$P(X > \log(30)) = `r round(prob_log_ca_gt30, 2)`$
 
 
 
