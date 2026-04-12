@@ -2,13 +2,13 @@
 title: "Introduction to using R with Quarto" 
 subtitle: "MASB11 VT 25" # something following a hash-sign will not be shown in the report
 execute: 
-  echo: true    #use to see/hide R-code in the report
-number-sections: true #secetions can be automatically numbered 
+  echo: true    # use to see/hide R-code in the report
+number-sections: true # secetions can be automatically numbered 
 highlight-style: pygments # a layout setting, you can try out something else https://quarto.org/docs/output-formats/html-code.html#highlighting
 format: 
   html:
     theme: cosmo #  layout setting, you can try something else https://quarto.org/docs/output-formats/html-themes.html
-    toc: true     #use to see table of contents
+    toc: true     # use to see table of contents
     code-fold: false # 
   pdf: default
   docx: default
@@ -53,12 +53,13 @@ R functions as a mini-calculator, but with much more capability. Write your R co
 
 ```{r}
 # write your R code here
+3 + 4
 
 ```
 
 If you write 3 + 4, the results will be shown when you render and you see the R code in the report. 
 
-You can hide the R code by adjusting the option `echo` as false (`echo: false`). This is an adjustement for this particular chunk and must begin with `#|`. Test what happens when you add `#| echo: false` in the beginning of the code-block and render the document again. 
+You can hide the R code by adjusting the option `echo` as false (`echo: false`). This is an adjustment for this particular chunk and must begin with `#|`. Test what happens when you add `#| echo: false` in the beginning of the code-block and render the document again. 
 
 Note that it is also possible to adjust the global options for the whole document, which is relevant for the mini projects. 
 
@@ -70,7 +71,7 @@ In the report being created you still see the result from the operation 3 + 4 as
 
 Imagine a situation where you want to put the results from your calculations directly into the report. First you have to save the result as an object in R, let us call the object "result".
 
-The you write a text which refers to the object "result". For the code to understand that this is an object from R, you write a backtick followed by a r in front of the object and end with another backtick. On my computer I get a backtick by Shift + backtick followed by space.
+Then you write a text which refers to the object "result". For the code to understand that this is an object from R, you write a backtick followed by a r in front of the object and end with another backtick. On my computer I get a backtick by Shift + backtick followed by space.
 
 ![](fig/bakåtfnuff.png){width="20%"}
 
@@ -140,3 +141,21 @@ $\sum_{i=1}^{n} x_i$
 Try to reproduce the following expressions in this document 
 
 ![](fig/uttryck.png){width="20%"}
+
+$$\alpha + \beta x$$
+
+$$H_0: \mu = 0$$
+
+$$x \geq 3$$
+
+
+
+
+
+
+
+
+
+
+
+
