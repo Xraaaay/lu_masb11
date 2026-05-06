@@ -284,6 +284,8 @@ Läs igenom avsnitten Suggested workflow and Instruction for reporting before yo
 How likely is it that a morning patient waits more than two hours for the analysis result?
 :::
 
+As defined in the Model Selection section, we assume that the waiting time in the morning follows a log-normal distribution: $$y_{am} \sim LogNormal(\mu_{am}, \sigma_{am})$$
+
 ```{r}
 prob_am_gt_120 <- 1 - pnorm(log(120), log_mean_am, log_sd_am)
 ```
@@ -295,6 +297,8 @@ prob_am_gt_120 <- 1 - pnorm(log(120), log_mean_am, log_sd_am)
 
 We want to be able to say that 95\% of afternoon patients will have their test result faster than $y$ minutes. What is the statistical term for $y$? What value does $y$ have according to the model you have chosen for the afternoon times?
 :::
+
+As defined in the Model Selection section, we assume that the waiting time in the afternoon also follows a log-normal distribution: $$y_{pm} \sim LogNormal(\mu_{pm}, \sigma_{pm})$$
 
 ```{r}
 perc_pm_95 <- exp(qnorm(0.95, log_mean_pm, log_sd_pm))
@@ -308,12 +312,14 @@ perc_pm_95 <- exp(qnorm(0.95, log_mean_pm, log_sd_pm))
 There are usually slightly more patients in the afternoon compared to the morning. Let's assume that 60\% of patients come in the morning and the rest in the afternoon. How likely is it that a patient sample taken at any time during the day takes more than two hours to analyze?
 :::
 
+We use the Law of Total Probability to calculate the probability of all-day waiting time exceeding two hours: $$P(T > 120) = P(T > 120 \vert AM) \cdot P(AM) + P(T > 120 \vert PM) \cdot P(PM)$$
+
 ```{r}
 log_t <- log(120)
 prob_gt_120 <- 0.6 * (1 - pnorm(log_t, log_mean_am, log_sd_am)) + 0.4 * (1 - pnorm(log_t, log_mean_pm, log_sd_pm))
 ```
 
-**Answer**: The probability that patient coming any time waits more than two hours is `r sprintf("%.2f", prob_gt_120 * 100)`%.
+**Answer**: The probability that a patient coming any time waits more than two hours is `r sprintf("%.2f", prob_gt_120 * 100)`%.
 
 :::{.callout-note icon=false}
 ### Question 3.4. 
