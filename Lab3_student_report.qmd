@@ -13,7 +13,7 @@ abstract: |
   - practice presenting assumptions, models, and conclusions from a statistical analysis in writing
   
 author: 
-  - name: "Your Name"
+  - name: "Ruowen Xiao"
 date: today
 toc: true
 number-sections: true
@@ -70,9 +70,12 @@ source("kod/funktioner_raknamedvariation_light.R")
 First, we want to investigate if the data from the 7 patients support our suspicion that the medication lowers saliva production. Set up a model and appropriate hypotheses.
 :::
 
-**Model**: <!-- Remove this and specify the model here  -->
+**Model**: We assume that the saliva amount follows a normal distribution: $$x \sim N(\mu, \sigma),$$ where $\sigma = 0.5 \text{ml/min}.$
 
-**Hypotheses**: <!-- Remove this and specify the hypotheses here  -->
+**Hypotheses**:
+
+- $H_0: \mu = 1$
+- $H_1: \mu < 1$
 
 :::{.callout-note icon=false}
 ### Task 1.2
@@ -80,10 +83,11 @@ Calculate the mean of the measurements.
 :::
 
 ```{r}
-# Write your R code here
+load("./data/lab3_filer/saliv.RData")
+mean_saliva <- mean(salivprod)
 ```
 
-**Answer**: <!-- Remove this and write down the mean of the sample -->
+**Answer**: The mean of measurements is `r sprintf("%.2f", mean_saliva)` ml/min.
 
 :::{.callout-note icon=false}
 ### Task 1.3
@@ -94,7 +98,11 @@ Use the routine `hypotes` to illustrate the test's critical region when the test
 #| warning: false
 #| message: false
 
-hypotes(0.5, 7, 1, 0.5, '<')
+sigma <- 0.5
+n <- 7
+mu0 <- 1
+alpha <- 0.05
+hypotes(sigma, n, mu0, alpha, '<')
 ```
 
 
@@ -104,13 +112,15 @@ The routine marks the critical region and provides a value $k$
 which is the boundary of the region. How has $k$ been calculated? Set up the mathematical formula for $k$ and use it to calculate $k$ yourself.
 :::
 
-**Equation for $k$**: <!-- Remove this and write the expression -->
+**Equation for $k$**: $$k = \mu_0 - \lambda_{\alpha} \frac{\sigma}{\sqrt{n}}$$
 
 **Own calculation of $k$**:
+
 ```{r}
-# Write your R code here
+k <- mu0 - qnorm(1 - alpha) * sigma / sqrt(n)
 ```
 
+$k = `r sprintf("%.2f", k)`$
 
 :::{.callout-note icon=false}
 ### Task 1.5
@@ -118,14 +128,14 @@ which is the boundary of the region. How has $k$ been calculated? Set up the mat
 Use your calculated sample mean to conduct the test. What is your conclusion about the null hypothesis, $H_0$?
 :::
 
-**Answer:** <!-- remove this and write your conclusions in plain text -->
+**Answer:** $H_0$ is rejected since $\bar x < k$.
 
 :::{.callout-note icon=false}
 ### Task 1.6
 What is your concrete interpretation of the significance level $\alpha = 0.05$ in this example?
 :::
 
-**Answer:** <!-- remove this and write your conclusions in plain text -->
+**Answer:** $\alpha$ is the probability of type I error, which means there is 5% probability of rejecting $H_0$ even though it's true. In this case, there is a 5% risk that we conclude the medication lowers saliva production while it actually doesn't.
 
 :::{.callout-note icon=false}
 ### Task 1.7
@@ -136,10 +146,12 @@ Examine how the critical region changes when you change the significance level t
 #| warning: false
 #| message: false
 
-# write your R code here
+alpha <- 0.01
+hypotes(sigma, n, mu0, alpha, '<')
+alpha <- 0.05
 ```
 
-**Answer:** <!-- remove this and write your conclusions in plain text -->
+**Answer:** When the significance level decreased to $0.01$, the sample mean is not in the critical area. We can conclude that $H_0$ is not rejected and the medication doesn't lower saliva production.
 
 # 2. Test Power and Power Function{.unnumbered}
 
@@ -149,7 +161,9 @@ Examine how the critical region changes when you change the significance level t
 #| fig-width: 7
 #| fig-height: 7
 #| out-width: 80%
-hypotes(0.5, 7, 1, 0.05, '<', 0.8)
+
+mu_true <- 0.8 
+hypotes(sigma, n, mu0, alpha, '<', mu_true)
 ```
 
 :::{.callout-note icon=false}
@@ -173,10 +187,11 @@ The command `styrka(0.5, 7, 1, 0.05, '<', 0.8)` gives you the previous figure pl
 #| fig-width: 7
 #| fig-height: 7
 #| out-width: 80%
-styrka(0.5, 7, 1, 0.05, '<', 0.8)
+
+styrka(sigma, n, mu0, alpha, '<', mu_true)
 ```
 
-<!-- remove this and write your conclusions in plain text -->
+**Answer:** $\beta$ is the probability of type II error, not rejecting $H_0$ when $H_1$ is true. In this example, $\beta$ is the probability that we conclude the medication doesn't lower saliva production even though it does. The test power is $1 - \beta$.
 
 :::{.callout-note icon=false}
 ### Task 2.2
@@ -184,10 +199,11 @@ Based on the power function, estimate the probability that with our test, we wil
 :::
 
 ```{r}
-# write your R code here
+mu_true <- 0.7
+styrka(sigma, n, mu0, alpha, '<', mu_true)
 ```
 
-**Answer:** <!-- remove this and write your conclusions in plain text -->
+**Answer:** The probability of detecting reduced saliva production with dry mouth is $48%$.
 
 :::{.callout-note icon=false}
 ### Task 2.3
@@ -195,10 +211,11 @@ How many patients should we measure if we want to have a 0.95 probability of det
 :::
 
 ```{r}
-# write your R code here
+n <- 30
+styrka(sigma, n, mu0, alpha, '<', mu_true)
 ```
 
-**Answer:** <!-- remove this and write your conclusions in plain text -->
+**Answer:** If we want to have a 95% probability of dectecting that individuals with dry mouth have reduced saliva production, we should measure at least `r n` patients.
 
 ## Answer to the example with dry mouth {.unnumbered}
 
@@ -229,11 +246,17 @@ Specify the model for A and B and specify hypotheses to test if there is a syste
 
 **Model for group A:** Let $X$ be the concentration of g of albumin per liter in measurements from laboratory A. The mean and variance for $X$ are $\mu_x$ and $\sigma^2_x$. Assume that measurements are independent and identically distributed. The mean is estimated by the sample mean $\hat{\mu}_x=\bar{x}$. According to the central limit theorem, $\bar{x} \overset{A}{\sim} N(\mu_x,\frac{\sigma_x}{\sqrt{n_x}})$.
 
-**Hypotheses for group A:** <!-- remove this and write your hypotheses-->
+**Hypotheses for group A:** 
 
-**Model for group B:** Let $Y$ be the concentration of g of albumin per liter in measurements from laboratory B. <!-- remove this and continue writing your model, specify assumptions-->
+- $H_0: \bar x = 42$
+- $H_1: \bar x \neq 42$
 
-**Hypotheses for group B:** <!-- remove this and write your hypotheses-->
+**Model for group B:** Let $Y$ be the concentration of g of albumin per liter in measurements from laboratory B. The mean and variance for $Y$ are $\mu_y$ and $\sigma^2_y$. Assume that measurements are independent and identically distributed. The mean is estimated by the sample mean $\hat{\mu}_y=\bar{y}$. According to the central limit theorem, $\bar{y} \overset{A}{\sim} N(\mu_y,\frac{\sigma_y}{\sqrt{n_y}})$.
+
+**Hypotheses for group B:** 
+
+- $H_0: \bar y = 42$
+- $H_1: \bar y \neq 42$
 
 :::{.callout-note icon=false}
 ### Exercise 3.2
@@ -245,7 +268,11 @@ t.test(AlbuminA, mu=42)
 t.test(AlbuminB, mu=42)
 ```
 
-**Answer:** <!-- remove this and write your conclusions in plain text -->
+**Answer:** 
+
+- For group A, the p-value is $0.03304$, which is less than $0.05$. Therefore, $H_0$ is rejected. The 95% confidence interval is $[42.05974, 42.94026]$.
+- For group B, the p-value is $0.08067$, which is greater than $0.05$. Therefore, $H_0$ cannot be rejected. The 95% confidence interval is $[35.68716, 42.51284]$.
+
 
 :::{.callout-note icon=false}
 ### Exercise 3.3
@@ -259,7 +286,7 @@ t.test(AlbuminB, mu=42, alternative="less")
 t.test(AlbuminB, mu=42, alternative="greater")
 ```
 
-**Answer:** <!-- remove this and write your conclusions in plain text -->
+**Answer:** For $H_1: \bar y < 42$, the p-value is $0.04034$ and the 95% confidence interval is $[-\infty, 41.77529]$. $H_0$ is rejected. For $H_1: \bar y > 42$, the p-value of $0.9597$ is much greater than $0.05$ and the 95% confidence interval is $[36.42471, \infty]$. We fail to reject $H_0$. When moving from one-sided to two-sided alternatives, the p-value apporximately doubles and the confidence interval gets wider.
 
 # 4. Comparison of Means in Two Populations (t-test for Two Independent Samples){.unnumbered}
 
@@ -278,7 +305,7 @@ Make a graphical description of the differences. What does the boxplot show?
 boxplot(Alger$Klorofyll ~ Alger$Grupp)
 ```
 
-**Answer:** <!-- remove this and write your conclusions in plain text -->
+**Answer:** The mean chlorophyll content of the group under light is around 13 and the values range from 11-14 , while the mean value of the group under dark is around 19 and the values range from 16-24. The group under light has a smaller mean value of chlorophyll content and has a lower variability than the group under dark.
 
 
 :::{.callout-note icon=false}
@@ -296,7 +323,7 @@ This can be done by adding the group variable in the `t.test` routine. Interpret
 t.test(Alger$Klorofyll ~ Alger$Grupp)
 ```
 
-**Answer:** <!-- remove this and write your conclusions in plain text -->
+**Answer:** The p-value of this two sample t-test is $0.01058$ which is smaller than $0.05$. therefore, we reject $H_0$ and conclude that there are statistically significant differences in the mean chlorophyll content between two groups.
 
 
 :::{.callout-note icon=false}
@@ -311,7 +338,7 @@ Investigate if the variances are equal using a so-called $\chi^2$-test. This is 
 var.test(Alger$Klorofyll ~ Alger$Grupp)
 ```
 
-**Answer:** <!-- remove this and write your conclusions in plain text -->
+**Answer:** The p-value of $0.4825$ is larger than $0.05$ and the 95% confidence interval is $[0.07190457, 3.67222210]$. We fail to reject $H_0$ and conclude that there is no significant difference between two variances.
 
 
 :::{.callout-note icon=false}
@@ -325,7 +352,9 @@ Repeat the t-test assuming equal variances by adding `var.equal=TRUE` in the R r
 t.test(Alger$Klorofyll ~ Alger$Grupp, var.equal=TRUE)
 ```
 
-**Answer:** <!-- remove this and write your conclusions in plain text -->
+**Answer:** The p-value and 95% confidence interval gets smaller than the t-test without assuming equal variances. The p-value of this two sample t-test is $0.009349$ which is smaller than $0.05$. therefore, we reject $H_0$ and conclude that there are statistically significant differences in the mean chlorophyll content between two groups.
+
+
 
 # 5. Test with Matched Data (Paired Samples){.unnumbered}
 
@@ -366,7 +395,7 @@ This is a common test, and one does not need to calculate a new sample. To infor
 t.test(Dammar$N_belast_V, Dammar$N_belast_S, paired=TRUE)
 ```
 
-**Answer**: <!-- remove this and write your conclusions in plain text -->
+**Answer**: The p-value of the paired t-test is $0.2624$, which is greater than $0.05$. Therefore, we fail to reject the $H_0$ and conclude that there is no significantly statistical difference in means between spring and summer.
 
 
 ## Answers to Some of the Questions in This Section: {.unnumbered}  
@@ -388,6 +417,10 @@ The remaining 20 (Group B) continued with their usual lifestyle, at least as far
 
 In the file `blodprov.Rdata` there is data with the variables ´Afore´,  ´Aefter´, ´Bfore´ and ´Befter´. 
 
+```{r}
+load("./data/lab3_filer/blodprov.Rdata")
+```
+
 ## Questions{.unnumbered}
 
 :::{.callout-note icon=false}
@@ -396,14 +429,33 @@ In the file `blodprov.Rdata` there is data with the variables ´Afore´,  ´Aeft
 Since we randomly selected the 20 individuals to undergo the activation program, there should be no differences between Group A and Group B regarding average cholesterol levels **before** the study begins. However, we want to ensure this explicitly so that we do not introduce a systematic difference between the groups from the start. 
 
 Is there a difference between the groups? Investigate with a suitable statistical test.
-
 :::
+
+**Model:** Let $X$ be the cholesterol levels of group A before the study with mean $\mu_x$ and variance $\sigma_x^2$, and $Y$ be the cholesterol levels of group B before the study with mean $\mu_y$ and variance $\sigma_y^2$. The means are estimated by sample means $\hat \mu_x = \bar x$ and $\hat \mu_y = \bar y$. According to the central limit theorem, $\bar{x} \overset{A}{\sim} N(\mu_x,\frac{\sigma_x}{\sqrt{n_x}})$.
+
+**Hypotheses:** $H_0: \mu_x = \mu_y$, $H_1: \mu_x \neq \mu_y$
+
+```{r}
+t.test(kolesterol$Afore, kolesterol$Bfore)
+```
+
+The p-value of the two sample t-test is $0.189$, which is greater than $0.05$. Therefore, we fail to reject $H_0$ and conclude that there is no significant difference in average initial cholesterol levels between two groups.
 
 :::{.callout-note icon=false}
 ### Question 6.2 
 
 Has the expected cholesterol level decreased in Group A? Investigate with a suitable statistical test.
 :::
+
+**Model:** Let $D$ be the difference in cholesterol level before and after the study. The random variable $D$ has mean $\mu$ and variance $\sigma^2$. We create a sample $(d_1,...,d_n)$ for differences in measurement values. The mean is estimated by the sample mean, $\hat{\mu}=\bar{d}$. According to the central limit theorem, $\bar{d} \overset{A}{\sim} N(\mu,\frac{\sigma}{\sqrt{n}})$.
+
+**Hypotheses:** $H_0: \mu = 0$, $H_1: \mu \neq 0$
+
+```{r}
+t.test(kolesterol$Aefter, kolesterol$Afore, paired=TRUE)
+```
+
+The p-value of the paired t-test is $7.042 \times 10^{-7}$, which is smaller than $0.05$. We reject $H_0$ and conclude that there is a significant difference in cholesterol levels of group A before and after the study.
 
 :::{.callout-note icon=false}
 ### Question 6.3 
@@ -413,12 +465,41 @@ It is not unlikely that patients in Group B, even though they do not undergo the
 Does this seem to be the case in our study? Study if there is a difference in cholesterol levels in patients in group B before and after the program. Investigate with a suitable statistical test.
 :::
 
+**Model:** Let $D$ be the difference in cholesterol level before and after the study. The random variable $D$ has mean $\mu$ and variance $\sigma^2$. We create a sample $(d_1,...,d_n)$ for differences in measurement values. The mean is estimated by the sample mean, $\hat{\mu}=\bar{d}$. According to the central limit theorem, $\bar{d} \overset{A}{\sim} N(\mu,\frac{\sigma}{\sqrt{n}})$.
+
+**Hypotheses:** $H_0: \mu = 0$, $H_1: \mu \neq 0$
+
+```{r}
+t.test(kolesterol$Befter, kolesterol$Bfore, paired=TRUE)
+```
+
+The p-value of the paired t-test is $0.1442$, which is greater than $0.05$. We fail to reject $H_0$ and conclude that there is no significant difference in cholesterol levels of group B before and after the study.
+
 :::{.callout-note icon=false}
 ### Question 6.4
 
 Did the activation program reduce the expected cholesterol level in Group A? Investigate with a suitable statistical test if the activation program affects the two groups differently?
 :::
 
+**Model:** Let $D$ be the difference in cholesterol level before and after the study. The random variable $D$ has mean $\mu$ and variance $\sigma^2$. We create a sample $(d_1,...,d_n)$ for differences in measurement values. The mean is estimated by the sample mean, $\hat{\mu}=\bar{d}$. According to the central limit theorem, $\bar{d} \overset{A}{\sim} N(\mu,\frac{\sigma}{\sqrt{n}})$.
+
+**Hypotheses:** $H_0: \mu = 0$, $H_1: \mu < 0$
+
+```{r}
+t.test(kolesterol$Aefter, kolesterol$Afore, paired=TRUE, alternative = "less")
+```
+
+The p-value of the one-sided paired t-test is $3.521 \times 10^{-7}$, which is smaller than $0.05$. We reject $H_0$ and conclude that there is a significant decrease in cholesterol levels of group A before and after the study.
+
+**Model:** Let $D_A$ be the difference in cholesterol level before and after the study of group A with mean $\mu_A$ and variance $\sigma_A^2$, and $D_B$ be the difference in cholesterol level before and after the study of group B with mean $\mu_B$ and variance $\sigma_B^2$. The means are estimated by the sample means $\hat{\mu_A}=\bar{d_A}$ and $\hat{\mu_B}=\bar{d_B}$. According to the central limit theorem, $\bar{d_A} \overset{A}{\sim} N(\mu_A,\frac{\sigma_A}{\sqrt{n_A}})$ and $\bar{d_B} \overset{A}{\sim} N(\mu_B,\frac{\sigma_B}{\sqrt{n_B}})$.
+
+**Hypotheses:** $H_0: \mu_A = \mu_B$, $H_1: \mu_A \neq \mu_B$
+
+```{r}
+t.test(kolesterol$Aefter - kolesterol$Afore, kolesterol$Befter - kolesterol$Bfore)
+```
+
+The p-value of the one-sided paired t-test is $5.915 \times 10^{-7}$, which is smaller than $0.05$. We reject $H_0$ and conclude that there is a significant difference in cholesterol level changes between group A and group B.
 
 ## Instruction for reporting{.unnumbered}
 
